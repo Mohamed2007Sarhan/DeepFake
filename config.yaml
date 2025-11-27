@@ -1,0 +1,41 @@
+# DeepFake Framework Configuration
+
+model:
+  device: "cuda"  # "cuda" or "cpu"
+  batch_size: 1
+  
+color_detection:
+  algorithm: "kmeans"  # "kmeans" or "dominant_color"
+  num_colors: 5
+  color_space: "RGB"  # "RGB", "HSV", "LAB"
+  
+body_size:
+  use_mediapipe: true
+  estimate_measurements: true
+  reference_height: 170  # cm, for measurement estimation
+  
+clothing_removal:
+  model_path: "models/nudify_model.onnx"
+  confidence_threshold: 0.7
+  blend_factor: 0.8
+  skin_tone_preservation: true
+  realistic_mode: true
+  gender_detection: true
+  body_type_aware: true
+  
+face_swap:
+  method: "dlib"  # "dlib", "mediapipe", or "opencv"
+  model_path: null  # Path to dlib shape predictor (optional)
+  blend_mode: "seamless"  # "seamless", "linear", or "feathered"
+  blend_factor: 0.8
+
+voice_cloning:
+  method: "auto"  # "coqui", "pyttsx3", "gtts", or "auto"
+  adjust_to_profile: true
+  sample_rate: 22050
+
+output:
+  save_intermediate: true
+  output_format: "png"
+  quality: 95
+
