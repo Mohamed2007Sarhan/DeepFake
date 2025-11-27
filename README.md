@@ -65,6 +65,28 @@ python gui_app.py
 - Advanced settings (blend factor, confidence)
 - Live information display
 
+### Web Interface (Most Convenient) 🆕
+
+```bash
+# Install web requirements
+pip install -r web_requirements.txt
+
+# Run web server
+python web_app.py
+
+# Open in browser: http://localhost:5000
+```
+
+**Features:**
+- Modern responsive web interface
+- All core features accessible through browser
+- Drag and drop file uploads
+- Real-time processing with progress indicators
+- Downloadable results
+- Mobile-friendly design
+
+See [WEB_INTERFACE_README.md](WEB_INTERFACE_README.md) for detailed documentation.
+
 ### Command Line
 
 #### Interactive Mode (Recommended)
@@ -270,10 +292,15 @@ deepfake/
 │       ├── skin_generator.py    # Realistic skin synthesis
 │       ├── image_processor.py   # Image utilities
 │       └── color_utils.py       # Color utilities
-├── gui_app.py                   # GUI application
+├── templates/                   # Web interface templates
+│   └── index.html               # Main web interface
+├── gui_app.py                   # Desktop GUI application
+├── web_app.py                   # Web interface application
 ├── main.py                      # CLI interface
 ├── config.yaml                  # Configuration
-├── requirements.txt             # Dependencies
+├── requirements.txt             # Main dependencies
+├── web_requirements.txt         # Web interface dependencies
+├── WEB_INTERFACE_README.md      # Web interface documentation
 └── README.md                    # This file
 ```
 

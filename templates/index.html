@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepFake Framework - Web Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #121212;
+            --secondary-dark: #1e1e1e;
+            --accent-color: #ff6b6b;
+            --accent-hover: #ff5252;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #333333;
+        }
+        
+        body {
+            background-color: var(--primary-dark);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--secondary-dark);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar {
+            background-color: var(--secondary-dark);
+            border-right: 1px solid var(--border-color);
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            background-color: var(--primary-dark);
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+        }
+        
+        .card {
+            background-color: var(--secondary-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(255, 107, 107, 0.05);
+        }
+        
+        .image-preview {
+            max-height: 300px;
+            overflow: hidden;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .result-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color);
+        }
+        
+        .form-control, .form-select {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.07);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25);
+            color: var(--text-primary);
+        }
+        
+        .progress {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .toast-container {
+            z-index: 10000;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+        
+        .result-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-fire text-danger"></i> DeepFake Framework
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-info-circle"></i> About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-2 col-md-3 sidebar d-none d-md-block">
+                <div class="p-3">
+                    <h5 class="text-center mb-4">Features</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-feature="clothing-removal">
+                                <i class="fas fa-tshirt"></i> Clothing Removal
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-feature="face-swap">
+                                <i class="fas fa-exchange-alt"></i> Face Swap
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-feature="voice-cloning">
+                                <i class="fas fa-microphone"></i> Voice Cloning
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-feature="analysis">
+                                <i class="fas fa-chart-bar"></i> Image Analysis
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-feature="batch-processing">
+                                <i class="fas fa-layer-group"></i> Batch Processing
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-10 col-md-9 main-content">
+                <div class="container-fluid p-4">
+                    <!-- Header -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h1 class="display-5 fw-bold">DeepFake Framework</h1>
+                            <p class="text-secondary">Advanced AI-powered image and voice processing tools</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card feature-card text-center p-3" data-feature="clothing-removal">
+                                <div class="feature-icon">
+                                    <i class="fas fa-tshirt"></i>
+                                </div>
+                                <h5>Clothing Removal</h5>
+                                <p class="text-secondary small">AI-powered clothing removal with realistic results</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card feature-card text-center p-3" data-feature="face-swap">
+                                <div class="feature-icon">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <h5>Face Swap</h5>
+                                <p class="text-secondary small">Swap faces between images and videos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card feature-card text-center p-3" data-feature="voice-cloning">
+                                <div class="feature-icon">
+                                    <i class="fas fa-microphone"></i>
+                                </div>
+                                <h5>Voice Cloning</h5>
+                                <p class="text-secondary small">Clone voices from audio samples</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card feature-card text-center p-3" data-feature="analysis">
+                                <div class="feature-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <h5>Image Analysis</h5>
+                                <p class="text-secondary small">Extract color and body size information</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clothing Removal Section -->
+                    <div class="feature-section" id="clothing-removal-section">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-tshirt"></i> Clothing Removal</span>
+                                        <span class="badge bg-danger">FLAGSHIP FEATURE</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <h5>Upload Image</h5>
+                                                <div class="upload-area" id="clothing-upload-area">
+                                                    <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                                    <p>Drag & drop your image here or click to browse</p>
+                                                    <p class="text-secondary small">Supports JPG, PNG, BMP</p>
+                                                    <input type="file" id="clothing-image-input" accept="image/*" class="d-none">
+                                                </div>
+                                                <div id="clothing-image-preview" class="image-preview d-none">
+                                                    <img src="" alt="Preview" class="img-fluid">
+                                                </div>
+                                                <div class="mt-3">
+                                                    <button id="process-clothing-btn" class="btn btn-primary w-100" disabled>
+                                                        <i class="fas fa-magic"></i> Remove Clothing
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5>Options</h5>
+                                                <div class="mb-3">
+                                                    <label class="form-label">AI Model</label>
+                                                    <select class="form-select" id="ai-model-select">
+                                                        <option value="traditional">Traditional Method (Fast)</option>
+                                                        <option value="advanced">Advanced AI Model (Better Quality)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Realism Level: <span id="blend-value">0.8</span></label>
+                                                    <input type="range" class="form-range" id="blend-factor" min="0.5" max="1" step="0.05" value="0.8">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Gender Override</label>
+                                                    <select class="form-select" id="gender-select">
+                                                        <option value="">Auto Detect</option>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Body Type</label>
+                                                    <select class="form-select" id="body-type-select">
+                                                        <option value="">Auto Detect</option>
+                                                        <option value="Rectangle">Rectangle</option>
+                                                        <option value="Pear">Pear</option>
+                                                        <option value="Inverted Triangle">Inverted Triangle</option>
+                                                        <option value="Hourglass">Hourglass</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Loading Spinner -->
+                                        <div class="text-center loading-spinner" id="clothing-loading">
+                                            <div class="spinner-border text-danger" role="status">
+                                                <span class="visually-hidden">Processing...</span>
+                                            </div>
+                                            <p class="mt-2">Removing clothing... This may take a moment</p>
+                                        </div>
+                                        
+                                        <!-- Result Section -->
+                                        <div class="result-section" id="clothing-result">
+                                            <hr class="my-4">
+                                            <h5>Result</h5>
+                                            <div class="text-center">
+                                                <img id="clothing-result-image" src="" alt="Result" class="result-image">
+                                            </div>
+                                            <div class="mt-3 text-center">
+                                                <button id="download-clothing-result" class="btn btn-success">
+                                                    <i class="fas fa-download"></i> Download Result
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Face Swap Section -->
+                    <div class="feature-section d-none" id="face-swap-section">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-exchange-alt"></i> Face Swap
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <h5>Source Image</h5>
+                                                <div class="upload-area" id="source-upload-area">
+                                                    <i class="fas fa-user fa-3x mb-3"></i>
+                                                    <p>Upload source face image</p>
+                                                    <input type="file" id="source-image-input" accept="image/*" class="d-none">
+                                                </div>
+                                                <div id="source-image-preview" class="image-preview d-none">
+                                                    <img src="" alt="Source" class="img-fluid">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5>Target Image/Video</h5>
+                                                <div class="upload-area" id="target-upload-area">
+                                                    <i class="fas fa-bullseye fa-3x mb-3"></i>
+                                                    <p>Upload target image or video</p>
+                                                    <input type="file" id="target-input" accept="image/*,video/*" class="d-none">
+                                                </div>
+                                                <div id="target-preview" class="image-preview d-none">
+                                                    <img src="" alt="Target" class="img-fluid">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-lg-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Blend Mode</label>
+                                                    <select class="form-select" id="blend-mode-select">
+                                                        <option value="seamless">Seamless</option>
+                                                        <option value="linear">Linear</option>
+                                                        <option value="feathered">Feathered</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="mt-4">
+                                                    <button id="swap-faces-btn" class="btn btn-primary w-100" disabled>
+                                                        <i class="fas fa-exchange-alt"></i> Swap Faces
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Loading Spinner -->
+                                        <div class="text-center loading-spinner" id="swap-loading">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Processing...</span>
+                                            </div>
+                                            <p class="mt-2">Swapping faces... This may take a moment</p>
+                                        </div>
+                                        
+                                        <!-- Result Section -->
+                                        <div class="result-section" id="swap-result">
+                                            <hr class="my-4">
+                                            <h5>Result</h5>
+                                            <div class="text-center">
+                                                <img id="swap-result-image" src="" alt="Result" class="result-image">
+                                            </div>
+                                            <div class="mt-3 text-center">
+                                                <button id="download-swap-result" class="btn btn-success">
+                                                    <i class="fas fa-download"></i> Download Result
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voice Cloning Section -->
+                    <div class="feature-section d-none" id="voice-cloning-section">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-microphone"></i> Voice Cloning
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <h5>Voice Sample</h5>
+                                                <div class="upload-area" id="voice-upload-area">
+                                                    <i class="fas fa-microphone-alt fa-3x mb-3"></i>
+                                                    <p>Upload voice sample</p>
+                                                    <p class="text-secondary small">Supports WAV, MP3, FLAC</p>
+                                                    <input type="file" id="voice-sample-input" accept="audio/*" class="d-none">
+                                                </div>
+                                                <div id="voice-sample-info" class="mt-2 d-none">
+                                                    <span class="badge bg-info">Sample Loaded</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5>Text to Synthesize</h5>
+                                                <div class="mb-3">
+                                                    <textarea class="form-control" id="voice-text" rows="4" placeholder="Enter text to synthesize with the cloned voice..."></textarea>
+                                                </div>
+                                                <button id="clone-voice-btn" class="btn btn-primary w-100" disabled>
+                                                    <i class="fas fa-clone"></i> Clone Voice
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Loading Spinner -->
+                                        <div class="text-center loading-spinner" id="voice-loading">
+                                            <div class="spinner-border text-info" role="status">
+                                                <span class="visually-hidden">Processing...</span>
+                                            </div>
+                                            <p class="mt-2">Cloning voice... This may take a moment</p>
+                                        </div>
+                                        
+                                        <!-- Result Section -->
+                                        <div class="result-section" id="voice-result">
+                                            <hr class="my-4">
+                                            <h5>Voice Cloning Result</h5>
+                                            <div class="text-center">
+                                                <audio id="voice-result-audio" controls class="w-100"></audio>
+                                            </div>
+                                            <div class="mt-3 text-center">
+                                                <button id="download-voice-result" class="btn btn-success">
+                                                    <i class="fas fa-download"></i> Download Audio
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Analysis Section -->
+                    <div class="feature-section d-none" id="analysis-section">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar"></i> Image Analysis
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <h5>Upload Image</h5>
+                                                <div class="upload-area" id="analysis-upload-area">
+                                                    <i class="fas fa-image fa-3x mb-3"></i>
+                                                    <p>Upload image for analysis</p>
+                                                    <input type="file" id="analysis-image-input" accept="image/*" class="d-none">
+                                                </div>
+                                                <div id="analysis-image-preview" class="image-preview d-none">
+                                                    <img src="" alt="Preview" class="img-fluid">
+                                                </div>
+                                                <div class="mt-3">
+                                                    <button id="analyze-btn" class="btn btn-primary w-100" disabled>
+                                                        <i class="fas fa-search"></i> Analyze Image
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5>Analysis Results</h5>
+                                                <div class="accordion" id="analysis-results">
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#clothes-color-result">
+                                                                <i class="fas fa-palette me-2"></i> Clothes Color Analysis
+                                                            </button>
+                                                        </h2>
+                                                        <div id="clothes-color-result" class="accordion-collapse collapse show">
+                                                            <div class="accordion-body">
+                                                                <div id="clothes-color-data">No data yet</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#body-size-result">
+                                                                <i class="fas fa-ruler-combined me-2"></i> Body Size Estimation
+                                                            </button>
+                                                        </h2>
+                                                        <div id="body-size-result" class="accordion-collapse collapse">
+                                                            <div class="accordion-body">
+                                                                <div id="body-size-data">No data yet</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto" id="toast-title">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toast-message">
+                This is a toast message.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let clothingImagePath = null;
+        let sourceImagePath = null;
+        let targetPath = null;
+        let voiceSamplePath = null;
+        let clothingResultImage = null;
+        let swapResultImage = null;
+        let voiceResultPath = null;
+
+        // DOM Elements
+        const clothingUploadArea = document.getElementById('clothing-upload-area');
+        const clothingImageInput = document.getElementById('clothing-image-input');
+        const clothingImagePreview = document.getElementById('clothing-image-preview');
+        const processClothingBtn = document.getElementById('process-clothing-btn');
+        const clothingLoading = document.getElementById('clothing-loading');
+        const clothingResult = document.getElementById('clothing-result');
+        const clothingResultImage = document.getElementById('clothing-result-image');
+        
+        const sourceUploadArea = document.getElementById('source-upload-area');
+        const sourceImageInput = document.getElementById('source-image-input');
+        const sourceImagePreview = document.getElementById('source-image-preview');
+        const targetUploadArea = document.getElementById('target-upload-area');
+        const targetInput = document.getElementById('target-input');
+        const targetPreview = document.getElementById('target-preview');
+        const swapFacesBtn = document.getElementById('swap-faces-btn');
+        const swapLoading = document.getElementById('swap-loading');
+        const swapResult = document.getElementById('swap-result');
+        const swapResultImage = document.getElementById('swap-result-image');
+        
+        const voiceUploadArea = document.getElementById('voice-upload-area');
+        const voiceSampleInput = document.getElementById('voice-sample-input');
+        const voiceSampleInfo = document.getElementById('voice-sample-info');
+        const cloneVoiceBtn = document.getElementById('clone-voice-btn');
+        const voiceLoading = document.getElementById('voice-loading');
+        const voiceResult = document.getElementById('voice-result');
+        const voiceResultAudio = document.getElementById('voice-result-audio');
+        
+        const analysisUploadArea = document.getElementById('analysis-upload-area');
+        const analysisImageInput = document.getElementById('analysis-image-input');
+        const analysisImagePreview = document.getElementById('analysis-image-preview');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const clothesColorData = document.getElementById('clothes-color-data');
+        const bodySizeData = document.getElementById('body-size-data');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Feature navigation
+            document.querySelectorAll('.nav-link[data-feature]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const feature = this.getAttribute('data-feature');
+                    showFeatureSection(feature);
+                });
+            });
+            
+            document.querySelectorAll('.feature-card[data-feature]').forEach(card => {
+                card.addEventListener('click', function() {
+                    const feature = this.getAttribute('data-feature');
+                    showFeatureSection(feature);
+                });
+            });
+            
+            // Clothing removal events
+            clothingUploadArea.addEventListener('click', () => clothingImageInput.click());
+            clothingImageInput.addEventListener('change', handleClothingImageUpload);
+            document.getElementById('blend-factor').addEventListener('input', updateBlendValue);
+            processClothingBtn.addEventListener('click', processClothingRemoval);
+            
+            // Face swap events
+            sourceUploadArea.addEventListener('click', () => sourceImageInput.click());
+            sourceImageInput.addEventListener('change', handleSourceImageUpload);
+            targetUploadArea.addEventListener('click', () => targetInput.click());
+            targetInput.addEventListener('change', handleTargetUpload);
+            swapFacesBtn.addEventListener('click', swapFaces);
+            
+            // Voice cloning events
+            voiceUploadArea.addEventListener('click', () => voiceSampleInput.click());
+            voiceSampleInput.addEventListener('change', handleVoiceSampleUpload);
+            cloneVoiceBtn.addEventListener('click', cloneVoice);
+            
+            // Analysis events
+            analysisUploadArea.addEventListener('click', () => analysisImageInput.click());
+            analysisImageInput.addEventListener('change', handleAnalysisImageUpload);
+            analyzeBtn.addEventListener('click', analyzeImage);
+        });
+
+        // Show feature section
+        function showFeatureSection(feature) {
+            // Hide all sections
+            document.querySelectorAll('.feature-section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            
+            // Show selected section
+            document.getElementById(`${feature}-section`).classList.remove('d-none');
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`.nav-link[data-feature="${feature}"]`).classList.add('active');
+        }
+
+        // Update blend value display
+        function updateBlendValue() {
+            const value = document.getElementById('blend-factor').value;
+            document.getElementById('blend-value').textContent = value;
+        }
+
+        // Handle clothing image upload
+        function handleClothingImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    clothingImagePreview.querySelector('img').src = e.target.result;
+                    clothingImagePreview.classList.remove('d-none');
+                    processClothingBtn.disabled = false;
+                    clothingImagePath = file.name; // In real app, this would be the actual path
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Handle source image upload
+        function handleSourceImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    sourceImagePreview.querySelector('img').src = e.target.result;
+                    sourceImagePreview.classList.remove('d-none');
+                    checkSwapReady();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Handle target upload
+        function handleTargetUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    targetPreview.querySelector('img').src = e.target.result;
+                    targetPreview.classList.remove('d-none');
+                    checkSwapReady();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Check if face swap is ready
+        function checkSwapReady() {
+            swapFacesBtn.disabled = !(sourceImagePreview.classList.contains('d-none') === false && 
+                                     targetPreview.classList.contains('d-none') === false);
+        }
+
+        // Handle voice sample upload
+        function handleVoiceSampleUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                voiceSampleInfo.classList.remove('d-none');
+                cloneVoiceBtn.disabled = document.getElementById('voice-text').value.trim() === '';
+                voiceSamplePath = file.name; // In real app, this would be the actual path
+            }
+        }
+
+        // Handle analysis image upload
+        function handleAnalysisImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    analysisImagePreview.querySelector('img').src = e.target.result;
+                    analysisImagePreview.classList.remove('d-none');
+                    analyzeBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Process clothing removal
+        function processClothingRemoval() {
+            if (!clothingImagePath) {
+                showToast('Error', 'Please upload an image first', 'danger');
+                return;
+            }
+            
+            // Show loading
+            clothingLoading.style.display = 'block';
+            processClothingBtn.disabled = true;
+            
+            // In a real app, this would make an API call
+            // For demo, we'll simulate processing
+            setTimeout(() => {
+                // Hide loading
+                clothingLoading.style.display = 'none';
+                processClothingBtn.disabled = false;
+                
+                // Show result (demo image)
+                clothingResultImage.src = 'https://placehold.co/400x300/1e1e1e/cccccc?text=Clothing+Removed';
+                clothingResult.classList.remove('d-none');
+                
+                showToast('Success', 'Clothing removal completed!', 'success');
+            }, 2000);
+        }
+
+        // Swap faces
+        function swapFaces() {
+            if (!sourceImagePath || !targetPath) {
+                showToast('Error', 'Please upload both source and target images', 'danger');
+                return;
+            }
+            
+            // Show loading
+            swapLoading.style.display = 'block';
+            swapFacesBtn.disabled = true;
+            
+            // In a real app, this would make an API call
+            // For demo, we'll simulate processing
+            setTimeout(() => {
+                // Hide loading
+                swapLoading.style.display = 'none';
+                swapFacesBtn.disabled = false;
+                
+                // Show result (demo image)
+                swapResultImage.src = 'https://placehold.co/400x300/1e1e1e/cccccc?text=Face+Swapped';
+                swapResult.classList.remove('d-none');
+                
+                showToast('Success', 'Face swap completed!', 'success');
+            }, 3000);
+        }
+
+        // Clone voice
+        function cloneVoice() {
+            const text = document.getElementById('voice-text').value.trim();
+            if (!voiceSamplePath) {
+                showToast('Error', 'Please upload a voice sample', 'danger');
+                return;
+            }
+            
+            if (!text) {
+                showToast('Error', 'Please enter text to synthesize', 'danger');
+                return;
+            }
+            
+            // Show loading
+            voiceLoading.style.display = 'block';
+            cloneVoiceBtn.disabled = true;
+            
+            // In a real app, this would make an API call
+            // For demo, we'll simulate processing
+            setTimeout(() => {
+                // Hide loading
+                voiceLoading.style.display = 'none';
+                cloneVoiceBtn.disabled = false;
+                
+                // Show result (demo audio)
+                voiceResultAudio.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+                voiceResult.classList.remove('d-none');
+                
+                showToast('Success', 'Voice cloning completed!', 'success');
+            }, 2500);
+        }
+
+        // Analyze image
+        function analyzeImage() {
+            // Show loading state
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Analyzing...';
+            
+            // In a real app, this would make an API call
+            // For demo, we'll simulate processing
+            setTimeout(() => {
+                // Reset button
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-search"></i> Analyze Image';
+                
+                // Show demo results
+                clothesColorData.innerHTML = `
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <div style="width: 20px; height: 20px; background-color: #ff0000; border: 1px solid #fff;"></div>
+                                <span class="ms-2">Red: 45%</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <div style="width: 20px; height: 20px; background-color: #0000ff; border: 1px solid #fff;"></div>
+                                <span class="ms-2">Blue: 30%</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #00ff00; border: 1px solid #fff;"></div>
+                                <span class="ms-2">Green: 25%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                bodySizeData.innerHTML = `
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Height
+                            <span class="badge bg-primary rounded-pill">170 cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Weight
+                            <span class="badge bg-primary rounded-pill">65 kg</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Chest
+                            <span class="badge bg-primary rounded-pill">92 cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Waist
+                            <span class="badge bg-primary rounded-pill">75 cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Hips
+                            <span class="badge bg-primary rounded-pill">95 cm</span>
+                        </li>
+                    </ul>
+                `;
+                
+                showToast('Success', 'Image analysis completed!', 'success');
+            }, 1500);
+        }
+
+        // Show toast notification
+        function showToast(title, message, type) {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            // Set background color based on type
+            toast.className = 'toast';
+            if (type === 'success') {
+                toast.classList.add('bg-success', 'text-white');
+            } else if (type === 'danger') {
+                toast.classList.add('bg-danger', 'text-white');
+            } else if (type === 'warning') {
+                toast.classList.add('bg-warning', 'text-dark');
+            } else {
+                toast.classList.add('bg-primary', 'text-white');
+            }
+            
+            // Show toast
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Voice text input event
+        document.getElementById('voice-text').addEventListener('input', function() {
+            cloneVoiceBtn.disabled = !(voiceSampleInfo.classList.contains('d-none') === false && 
+                                      this.value.trim() !== '');
+        });
+    </script>
+</body>
+</html>
