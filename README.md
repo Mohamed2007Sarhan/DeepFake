@@ -128,5 +128,6 @@ This project is created to demonstrate the capabilities and risks of modern AI m
 ---
 
 <p align="center">
-  <sub>Created with ❤️ by the DeepFake Team</sub>
+  <sub>Created with ❤️ by the (Mohamed Sarhan)</sub>
 </p>
+
