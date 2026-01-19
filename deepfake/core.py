@@ -1,4 +1,4 @@
-"""
+utf-8"""
 DeepFake Framework Core Module
 Main API for the complete framework
 """
@@ -30,10 +30,10 @@ class DeepFakeFramework:
             config_path: Path to config.yaml file
             **kwargs: Override config values
         """
-        # Load config
+        
         self.config = self._load_config(config_path, **kwargs)
         
-        # Initialize components
+        
         self.color_detector = ClothesColorDetector(
             algorithm=self.config["color_detection"]["algorithm"],
             num_colors=self.config["color_detection"]["num_colors"]
@@ -51,14 +51,14 @@ class DeepFakeFramework:
             realistic_mode=self.config["clothing_removal"].get("realistic_mode", True)
         )
         
-        # Initialize face swapper
+        
         face_swap_config = self.config.get("face_swap", {})
         self.face_swapper = FaceSwapper(
             method=face_swap_config.get("method", "dlib"),
             model_path=face_swap_config.get("model_path")
         )
         
-        # Initialize voice cloner
+        
         voice_config = self.config.get("voice_cloning", {})
         self.voice_cloner = VoiceCloner(
             method=voice_config.get("method", "auto"),
@@ -86,7 +86,7 @@ class DeepFakeFramework:
                 "blend_factor": 0.8
             },
             "voice_cloning": {
-                "method": "auto",  # "coqui", "pyttsx3", "gtts", or "auto"
+                "method": "auto",  
                 "adjust_to_profile": True,
                 "sample_rate": 22050
             },
@@ -98,7 +98,7 @@ class DeepFakeFramework:
                 file_config = yaml.safe_load(f)
                 default_config.update(file_config)
         
-        # Override with kwargs
+        
         for key, value in kwargs.items():
             if key in default_config:
                 if isinstance(value, dict) and isinstance(default_config[key], dict):
@@ -171,15 +171,15 @@ class DeepFakeFramework:
         """
         results = {}
         
-        # Get clothes color
+        
         print("Analyzing clothes color...")
         results["clothes_color"] = self.get_clothes_color(image_path)
         
-        # Get body size
+        
         print("Estimating body size...")
         results["body_size"] = self.get_body_size(image_path)
         
-        # Remove clothing
+        
         print("Removing clothing...")
         processed_image = self.remove_clothes(image_path, output_path=output_path)
         results["processed_image"] = processed_image
@@ -316,7 +316,7 @@ class DeepFakeFramework:
             Synthesis result dictionary
         """
         if voice_sample_path:
-            # Analyze voice first
+            
             self.voice_cloner.analyze_voice(voice_sample_path)
         
         return self.voice_cloner.synthesize_speech(

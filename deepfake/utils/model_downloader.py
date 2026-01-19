@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Model Downloader for Clothing Removal
 Downloads and manages AI models for advanced clothing removal
 """
@@ -16,12 +16,12 @@ class ModelDownloader:
     Downloads and manages AI models for clothing removal
     """
     
-    # Best model templates available (prioritized)
+    
     MODELS = {
         "nudify_advanced": {
             "name": "Nudify Advanced Model",
             "description": "Best quality model for clothing removal",
-            "url": "https://github.com/ErwannMillon/PhotoVerse/releases/download/v1.0/model.zip",  # Placeholder
+            "url": "https://github.com/ErwannMillon/PhotoVerse/releases/download/v1.0/model.zip",  
             "filename": "nudify_model.onnx",
             "size_mb": 150,
             "recommended": True
@@ -52,7 +52,7 @@ class ModelDownloader:
             if model_info.get("recommended", False):
                 return {**model_info, "id": model_id}
         
-        # Fallback to first model
+        
         first_model = list(self.MODELS.items())[0]
         return {**first_model[1], "id": first_model[0]}
     
@@ -79,12 +79,12 @@ class ModelDownloader:
         
         model_path = self.models_dir / model_info["filename"]
         
-        # Check if already exists
+        
         if model_path.exists():
             print(f"✓ Model already exists: {model_path}")
             return str(model_path)
         
-        # Check if URL is available
+        
         if model_info.get("url") is None:
             print(f"\n{'='*60}")
             print(f"Model: {model_info['name']}")
@@ -115,7 +115,7 @@ class ModelDownloader:
             
             return None
         
-        # Try to download if URL provided
+        
         print(f"\nDownloading {model_info['name']}...")
         print(f"Description: {model_info['description']}")
         print(f"Size: {model_info['size_mb']} MB")
@@ -130,12 +130,12 @@ class ModelDownloader:
             print(f"\n✓ Model downloaded successfully!")
             print(f"  Location: {model_path}")
             
-            # Check if it's a zip file
+            
             if model_path.suffix == ".zip":
                 print("Extracting zip file...")
                 with zipfile.ZipFile(model_path, 'r') as zip_ref:
                     zip_ref.extractall(self.models_dir)
-                # Find the actual model file
+                
                 for file in self.models_dir.rglob("*.onnx"):
                     if file.name == model_info["filename"]:
                         model_path = file
@@ -161,7 +161,7 @@ class ModelDownloader:
             with tqdm(unit='B', unit_scale=True, unit_divisor=1024) as tqdm_instance:
                 urllib.request.urlretrieve(url, filepath, reporthook=progress_hook)
         except ImportError:
-            # Fallback without progress bar
+            
             urllib.request.urlretrieve(url, filepath)
     
     def list_available_models(self) -> Dict:
@@ -201,11 +201,11 @@ def setup_recommended_model() -> Optional[str]:
     """
     downloader = ModelDownloader()
     
-    # Check if model already exists
+    
     model_path = downloader.get_model_path()
     if model_path and Path(model_path).exists():
         return model_path
     
-    # Model doesn't exist - that's OK, traditional method works great
+    
     return None
 

@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Realistic Skin Texture Generator
 Body-aware skin generation with texture synthesis
 """
@@ -10,10 +10,10 @@ from typing import Tuple, Optional, Dict
 try:
     from scipy.ndimage import gaussian_filter
 except ImportError:
-    # Fallback to OpenCV if scipy not available
+    
     def gaussian_filter(image, sigma):
         """Fallback gaussian filter using OpenCV"""
-        kernel_size = int(sigma * 6) // 2 * 2 + 1  # Make odd
+        kernel_size = int(sigma * 6) // 2 * 2 + 1  
         return cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma)
 
 
@@ -45,42 +45,42 @@ class RealisticSkinGenerator:
         h, w = region_shape
         skin_image = np.ones((h, w, 3), dtype=np.float32) * base_tone.astype(np.float32)
         
-        # Add natural variations
-        # Variation in saturation and brightness
+        
+        
         noise = np.random.randn(h, w, 3) * 8.0
         skin_image = np.clip(skin_image + noise, 0, 255)
         
-        # Add gradient based on body curvature
+        
         y_gradient = np.linspace(0, 1, h)[:, np.newaxis]
         x_gradient = np.linspace(0, 1, w)[np.newaxis, :]
         
-        # Center is slightly lighter (lighting effect)
+        
         center_y, center_x = h // 2, w // 2
         dist_from_center = np.sqrt((np.arange(h)[:, np.newaxis] - center_y)**2 + 
                                   (np.arange(w)[np.newaxis, :] - center_x)**2)
         max_dist = np.sqrt(center_y**2 + center_x**2)
         center_lighting = 1.0 - (dist_from_center / max_dist) * 0.15
         
-        # Apply lighting
+        
         for c in range(3):
             skin_image[:, :, c] *= center_lighting
         
-        # Gender-specific tone adjustments
-        if gender == "male":
-            # Slightly more olive/yellow tones
-            skin_image[:, :, 0] *= 1.02  # More red
-            skin_image[:, :, 1] *= 0.98  # Less green
-        elif gender == "female":
-            # Slightly more pink/rosy tones
-            skin_image[:, :, 0] *= 1.03  # More red
-            skin_image[:, :, 2] *= 1.01  # Slightly more blue
         
-        # Body type specific variations
+        if gender == "male":
+            
+            skin_image[:, :, 0] *= 1.02  
+            skin_image[:, :, 1] *= 0.98  
+        elif gender == "female":
+            
+            skin_image[:, :, 0] *= 1.03  
+            skin_image[:, :, 2] *= 1.01  
+        
+        
         if body_type in ["Pear", "Hourglass"]:
-            # Softer, more even tone
+            
             skin_image = gaussian_filter(skin_image, sigma=1.0)
         elif body_type == "Inverted Triangle":
-            # Slightly more defined variations
+            
             skin_image = gaussian_filter(skin_image, sigma=0.5)
         
         return np.clip(skin_image, 0, 255).astype(np.uint8)
@@ -99,22 +99,22 @@ class RealisticSkinGenerator:
         """
         h, w = skin_image.shape[:2]
         
-        # Generate fine texture pattern
-        # High frequency noise for pores
+        
+        
         pore_noise = np.random.randn(h, w) * 2.0
         
-        # Medium frequency for skin variations
+        
         variation_noise = np.random.randn(h, w) * 4.0
         variation_noise = gaussian_filter(variation_noise, sigma=2.0)
         
-        # Low frequency for overall skin texture
+        
         texture_noise = np.random.randn(h, w) * 1.5
         texture_noise = gaussian_filter(texture_noise, sigma=5.0)
         
-        # Combine textures
+        
         combined_texture = (pore_noise + variation_noise * 0.7 + texture_noise * 0.4) * intensity
         
-        # Apply to each channel with slight variations
+        
         result = skin_image.copy().astype(np.float32)
         for c in range(3):
             channel_variation = combined_texture * (1.0 + (c - 1) * 0.1)
@@ -139,29 +139,29 @@ class RealisticSkinGenerator:
         h, w = skin_image.shape[:2]
         result = skin_image.copy().astype(np.float32)
         
-        # Create shadow map
+        
         shadow_map = np.ones((h, w), dtype=np.float32)
         
-        # Body curvature shadows (sides are darker)
+        
         x_gradient = np.linspace(-1, 1, w)[np.newaxis, :]
-        edge_shadows = np.abs(x_gradient) * 0.1  # Darker at edges
+        edge_shadows = np.abs(x_gradient) * 0.1  
         
-        # Vertical shadows (under curves)
+        
         y_gradient = np.linspace(0, 1, h)[:, np.newaxis]
-        vertical_shadows = y_gradient * 0.05  # Slightly darker at bottom
+        vertical_shadows = y_gradient * 0.05  
         
-        # Combine shadows
+        
         shadow_map -= (edge_shadows + vertical_shadows)
         
-        # Body type specific shadow patterns
+        
         if body_type == "Pear":
-            # More shadow on upper body, lighter on lower
+            
             shadow_map[:h//2, :] *= 0.95
         elif body_type == "Inverted Triangle":
-            # More defined shadows
+            
             shadow_map *= 0.97
         
-        # Apply shadows only to masked region
+        
         mask_normalized = (mask / 255.0)[:, :, np.newaxis]
         shadow_map_3d = shadow_map[:, :, np.newaxis]
         
@@ -191,20 +191,20 @@ class RealisticSkinGenerator:
         Returns:
             Complete realistic skin image
         """
-        # Step 1: Generate base tone with gradients
+        
         skin = self.generate_skin_tone_gradient(
             base_tone, region_shape, body_type, gender
         )
         
-        # Step 2: Add texture
+        
         if add_texture:
             skin = self.add_skin_texture(skin, intensity=0.25)
         
-        # Step 3: Add shadows
+        
         if add_shadows:
             skin = self.add_body_shadows(skin, mask, body_type)
         
-        # Ensure mask is applied
+        
         mask_3d = (mask / 255.0)[:, :, np.newaxis]
         skin = skin * mask_3d
         
@@ -226,12 +226,12 @@ class RealisticSkinGenerator:
         Returns:
             Seamlessly blended image
         """
-        # Create feathered mask for smooth blending
+        
         mask_float = mask.astype(np.float32) / 255.0
         feathered_mask = cv2.GaussianBlur(mask_float, (blend_size * 2 + 1, blend_size * 2 + 1), 0)
         feathered_mask_3d = feathered_mask[:, :, np.newaxis]
         
-        # Blend
+        
         result = (skin_image * feathered_mask_3d + 
                  original_image * (1 - feathered_mask_3d))
         

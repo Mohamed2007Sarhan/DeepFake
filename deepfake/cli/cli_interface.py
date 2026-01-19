@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Enhanced CLI Interface for DeepFake Framework
 Modern command-line interface with colors, menus, and progress indicators
 """
@@ -186,7 +186,7 @@ class CLIInterface:
         if not path:
             return None
         
-        path = path.strip('"\'')  # Remove quotes
+        path = path.strip('"\'')  
         
         if not Path(path).exists():
             self.print_error(f"File not found: {path}")
@@ -251,7 +251,7 @@ class CLIInterface:
         if choice == "0":
             return
         
-        # Get input image
+        
         input_path = self.prompt_file("Enter input image path")
         if not input_path:
             return
@@ -261,7 +261,7 @@ class CLIInterface:
         
         self.print_info(f"Processing: {Path(input_path).name}")
         
-        if choice == "1":  # Complete
+        if choice == "1":  
             output_path = self.prompt_save_file("Enter output path", "output_complete.png")
             if not output_path:
                 output_path = "output_complete.png"
@@ -273,21 +273,21 @@ class CLIInterface:
                 except Exception as e:
                     self.print_error(str(e))
         
-        elif choice == "2":  # Color only
+        elif choice == "2":  
             try:
                 result = self.framework.get_clothes_color(input_path)
                 self._display_color_results(result)
             except Exception as e:
                 self.print_error(str(e))
         
-        elif choice == "3":  # Size only
+        elif choice == "3":  
             try:
                 result = self.framework.get_body_size(input_path)
                 self._display_size_results(result)
             except Exception as e:
                 self.print_error(str(e))
         
-        elif choice == "4":  # Removal only
+        elif choice == "4":  
             output_path = self.prompt_save_file("Enter output path", "output_removed.png")
             if not output_path:
                 output_path = "output_removed.png"
@@ -447,7 +447,7 @@ class CLIInterface:
         """Display complete processing results"""
         self.print_success(f"Processing complete! Saved to: {output_path}")
         
-        # Color results
+        
         if "clothes_color" in result and result["clothes_color"].get("primary_color"):
             pc = result["clothes_color"]["primary_color"]
             color_data = {
@@ -457,7 +457,7 @@ class CLIInterface:
             }
             self.display_results_table("Color Detection", color_data)
         
-        # Body size results
+        
         if "body_size" in result and "measurements" in result["body_size"]:
             m = result["body_size"]["measurements"]
             size_data = {
@@ -530,12 +530,12 @@ class CLIInterface:
         
         self.print_info("This is the most advanced feature - realistic clothing removal")
         
-        # Get input image
+        
         input_path = self.prompt_file("Enter input image path")
         if not input_path:
             return
         
-        # Advanced options
+        
         if self.use_rich:
             use_advanced = Confirm.ask(
                 "\n[bold yellow]Use advanced AI model?[/bold yellow] "
@@ -546,7 +546,7 @@ class CLIInterface:
             use_adv = input("\nUse advanced AI model? (y/n, default=n): ").strip().lower()
             use_advanced = use_adv == 'y'
         
-        # Gender override
+        
         if self.use_rich:
             gender_choice = Prompt.ask(
                 "\n[cyan]Gender[/cyan] ([dim]auto/male/female[/dim])",
@@ -558,7 +558,7 @@ class CLIInterface:
         
         gender = None if gender_choice == "auto" else gender_choice
         
-        # Body type
+        
         if self.use_rich:
             body_choice = Prompt.ask(
                 "[cyan]Body Type[/cyan] ([dim]auto/Rectangle/Pear/Inverted Triangle/Hourglass[/dim])",
@@ -570,7 +570,7 @@ class CLIInterface:
         
         body_type = None if body_choice == "auto" else body_choice
         
-        # Blend factor
+        
         if self.use_rich:
             blend_str = Prompt.ask(
                 "[cyan]Blend Factor[/cyan] ([dim]0.0-1.0, higher=more realistic, default=0.85[/dim])",

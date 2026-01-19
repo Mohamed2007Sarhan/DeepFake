@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Image Processing Utilities
 """
 
@@ -25,7 +25,7 @@ class ImageProcessor:
         if image.dtype != np.uint8:
             image = (image * 255).astype(np.uint8)
         
-        # Convert RGB to BGR for OpenCV
+        
         if len(image.shape) == 3 and image.shape[2] == 3:
             image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         else:

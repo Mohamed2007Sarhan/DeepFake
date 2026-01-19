@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Body Size Estimation Module
 """
 
@@ -49,7 +49,7 @@ class BodySizeEstimator:
         if not self.use_mediapipe:
             return None
         
-        # Convert RGB to BGR for MediaPipe (it expects RGB actually)
+        
         results = self.pose.process(image)
         
         if not results.pose_landmarks:
@@ -58,13 +58,13 @@ class BodySizeEstimator:
         landmarks = results.pose_landmarks.landmark
         h, w = image.shape[:2]
         
-        # Extract key points
+        
         key_points = {}
         for idx, landmark in enumerate(landmarks):
             key_points[idx] = {
                 "x": landmark.x * w,
                 "y": landmark.y * h,
-                "z": landmark.z * w,  # MediaPipe z is relative
+                "z": landmark.z * w,  
                 "visibility": landmark.visibility
             }
         
@@ -91,7 +91,7 @@ class BodySizeEstimator:
         landmarks = pose_data["landmarks"]
         h, w = pose_data["height"], pose_data["width"]
         
-        # MediaPipe pose landmark indices
+        
         LEFT_SHOULDER = 11
         RIGHT_SHOULDER = 12
         LEFT_HIP = 23
@@ -113,43 +113,43 @@ class BodySizeEstimator:
         
         measurements = {}
         
-        # Height estimation (from top of head to ankle)
-        # Using shoulder as approximate head top
+        
+        
         shoulder_avg_y = (landmarks[LEFT_SHOULDER]["y"] + landmarks[RIGHT_SHOULDER]["y"]) / 2
         ankle_avg_y = (landmarks[LEFT_ANKLE]["y"] + landmarks[RIGHT_ANKLE]["y"]) / 2
         pixel_height = abs(shoulder_avg_y - ankle_avg_y)
         
-        # Shoulder width
+        
         if LEFT_SHOULDER in landmarks and RIGHT_SHOULDER in landmarks:
             shoulder_width = distance_2d(landmarks[LEFT_SHOULDER], landmarks[RIGHT_SHOULDER])
             measurements["shoulder_width_pixels"] = shoulder_width
             measurements["shoulder_width_cm"] = (shoulder_width / pixel_height) * self.reference_height
         
-        # Hip width
+        
         if LEFT_HIP in landmarks and RIGHT_HIP in landmarks:
             hip_width = distance_2d(landmarks[LEFT_HIP], landmarks[RIGHT_HIP])
             measurements["hip_width_pixels"] = hip_width
             measurements["hip_width_cm"] = (hip_width / pixel_height) * self.reference_height
         
-        # Arm span (approximate)
+        
         if LEFT_WRIST in landmarks and RIGHT_WRIST in landmarks:
             arm_span = distance_2d(landmarks[LEFT_WRIST], landmarks[RIGHT_WRIST])
             measurements["arm_span_pixels"] = arm_span
             measurements["arm_span_cm"] = (arm_span / pixel_height) * self.reference_height
         
-        # Leg length (hip to ankle)
+        
         if LEFT_HIP in landmarks and LEFT_ANKLE in landmarks:
             leg_length = distance_2d(landmarks[LEFT_HIP], landmarks[LEFT_ANKLE])
             measurements["leg_length_pixels"] = leg_length
             measurements["leg_length_cm"] = (leg_length / pixel_height) * self.reference_height
         
-        # Body proportions
+        
         measurements["pixel_height"] = pixel_height
         measurements["estimated_height_cm"] = self.reference_height
         measurements["image_height"] = h
         measurements["image_width"] = w
         
-        # Body type classification (simplified)
+        
         if "shoulder_width_cm" in measurements and "hip_width_cm" in measurements:
             shoulder_hip_ratio = measurements["shoulder_width_cm"] / measurements["hip_width_cm"] if measurements["hip_width_cm"] > 0 else 1.0
             if shoulder_hip_ratio > 1.1:
@@ -173,10 +173,10 @@ class BodySizeEstimator:
         Returns:
             Dictionary with body size information
         """
-        # Load image
+        
         image = self.image_processor.load_image(image_path)
         
-        # Detect pose
+        
         pose_data = self.detect_pose_landmarks(image)
         
         if pose_data is None:
@@ -185,10 +185,10 @@ class BodySizeEstimator:
                 "measurements": {}
             }
         
-        # Calculate measurements
+        
         measurements = self.calculate_body_measurements(pose_data)
         
-        # Detect gender
+        
         gender_info = self.gender_detector.detect_gender(image, pose_data)
         
         return {
@@ -217,7 +217,7 @@ class BodySizeEstimator:
         
         landmarks = pose_data["landmarks"]
         
-        # Find min/max coordinates
+        
         x_coords = [p["x"] for p in landmarks.values()]
         y_coords = [p["y"] for p in landmarks.values()]
         
@@ -238,12 +238,12 @@ class BodySizeEstimator:
         pose_data = self.detect_pose_landmarks(image)
         
         if pose_data is None or pose_data.get("segmentation_mask") is None:
-            # Fallback: use simple thresholding
+            
             gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
             _, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             return mask
         
-        # Use MediaPipe segmentation mask
+        
         mask = (pose_data["segmentation_mask"] * 255).astype(np.uint8)
         return mask
 

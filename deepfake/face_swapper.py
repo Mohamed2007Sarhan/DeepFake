@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Face Swapping Module
 Supports image-to-image and image-to-video face swapping
 """
@@ -48,7 +48,7 @@ class FaceSwapper:
         Returns:
             Tuple of (swapped_image, metadata_dict)
         """
-        # Detect faces
+        
         source_faces = self.face_detector.detect_faces(source_image)
         target_faces = self.face_detector.detect_faces(target_image)
         
@@ -57,11 +57,11 @@ class FaceSwapper:
         if not target_faces:
             raise ValueError("No face detected in target image")
         
-        # Select faces
+        
         source_face = source_faces[min(source_face_idx, len(source_faces) - 1)]
         target_face = target_faces[min(target_face_idx, len(target_faces) - 1)]
         
-        # Get landmarks
+        
         source_landmarks = self.face_detector.get_face_landmarks(
             source_image, source_face["bbox"]
         )
@@ -72,7 +72,7 @@ class FaceSwapper:
         if source_landmarks is None or target_landmarks is None:
             raise ValueError("Could not detect facial landmarks")
         
-        # Perform face swap
+        
         result = self._perform_swap(
             source_image, target_image,
             source_face["bbox"], target_face["bbox"],
@@ -100,54 +100,54 @@ class FaceSwapper:
         """
         Core face swapping algorithm
         """
-        # Extract and align source face
+        
         source_face, source_bbox_adj = self.face_detector.extract_face(
             source_img, source_bbox, padding=50
         )
         
-        # Get source landmarks in extracted region
+        
         x1, y1, _, _ = source_bbox_adj
         source_landmarks_adj = source_landmarks.copy()
         source_landmarks_adj[:, 0] -= x1
         source_landmarks_adj[:, 1] -= y1
         
-        # Align source face
+        
         aligned_source, source_transform = self.face_detector.align_face(
             source_face, source_landmarks_adj, target_size=(256, 256)
         )
         
-        # Extract target face region
+        
         target_face_roi, target_bbox_adj = self.face_detector.extract_face(
             target_img, target_bbox, padding=50
         )
         
-        # Get target landmarks in extracted region
+        
         x2, y2, _, _ = target_bbox_adj
         target_landmarks_adj = target_landmarks.copy()
         target_landmarks_adj[:, 0] -= x2
         target_landmarks_adj[:, 1] -= y2
         
-        # Align target face
+        
         aligned_target, target_transform = self.face_detector.align_face(
             target_face_roi, target_landmarks_adj, target_size=(256, 256)
         )
         
-        # Get face mask for source
+        
         source_mask = self.face_detector.get_face_mask(
             aligned_source, 
             np.array([[p[0], p[1]] for p in source_landmarks_adj[:6]]),
             dilation=15
         )
         
-        # Resize source face to match target region
+        
         target_roi_h, target_roi_w = target_face_roi.shape[:2]
         resized_source = cv2.resize(aligned_source, (target_roi_w, target_roi_h))
         resized_mask = cv2.resize(source_mask, (target_roi_w, target_roi_h))
         
-        # Apply color correction to match target skin tone
+        
         color_corrected = self._color_correct(resized_source, target_face_roi, resized_mask)
         
-        # Blend faces
+        
         if blend_mode == "seamless":
             swapped_roi = self._seamless_blend(
                 color_corrected, target_face_roi, resized_mask
@@ -156,12 +156,12 @@ class FaceSwapper:
             swapped_roi = self._linear_blend(
                 color_corrected, target_face_roi, resized_mask, blend_factor
             )
-        else:  # feathered
+        else:  
             swapped_roi = self._feathered_blend(
                 color_corrected, target_face_roi, resized_mask
             )
         
-        # Create result image
+        
         result = target_img.copy()
         x, y, w, h = target_bbox_adj
         result[y:y+h, x:x+w] = swapped_roi
@@ -173,25 +173,25 @@ class FaceSwapper:
         """
         Color correct source face to match target skin tone
         """
-        # Convert to LAB color space for better color correction
+        
         source_lab = cv2.cvtColor(source, cv2.COLOR_RGB2LAB)
         target_lab = cv2.cvtColor(target, cv2.COLOR_RGB2LAB)
         
-        # Calculate mean colors
+        
         mask_3d = (mask / 255.0)[:, :, np.newaxis]
         
         source_mean = (source_lab * mask_3d).sum(axis=(0, 1)) / (mask_3d.sum() + 1e-6)
         target_mean = (target_lab * mask_3d).sum(axis=(0, 1)) / (mask_3d.sum() + 1e-6)
         
-        # Apply color correction (preserve L channel, adjust A and B)
+        
         corrected = source_lab.copy()
         corrected[:, :, 1] = corrected[:, :, 1] - source_mean[1] + target_mean[1]
         corrected[:, :, 2] = corrected[:, :, 2] - source_mean[2] + target_mean[2]
         
-        # Clamp values
+        
         corrected = np.clip(corrected, 0, 255)
         
-        # Convert back to RGB
+        
         corrected_rgb = cv2.cvtColor(corrected.astype(np.uint8), cv2.COLOR_LAB2RGB)
         
         return corrected_rgb
@@ -199,7 +199,7 @@ class FaceSwapper:
     def _seamless_blend(self, source: np.ndarray, target: np.ndarray,
                        mask: np.ndarray) -> np.ndarray:
         """Seamless cloning blend"""
-        # Find center of mask
+        
         M = cv2.moments(mask)
         if M["m00"] > 0:
             cx = int(M["m10"] / M["m00"])
@@ -207,7 +207,7 @@ class FaceSwapper:
         else:
             cy, cx = [s // 2 for s in mask.shape]
         
-        # Apply seamless cloning
+        
         mask_3d = np.stack([mask] * 3, axis=2)
         result = cv2.seamlessClone(
             source, target, mask, (cx, cy), cv2.NORMAL_CLONE
@@ -228,7 +228,7 @@ class FaceSwapper:
     def _feathered_blend(self, source: np.ndarray, target: np.ndarray,
                         mask: np.ndarray) -> np.ndarray:
         """Feathered edge blending"""
-        # Create feathered mask
+        
         blurred_mask = cv2.GaussianBlur(mask, (21, 21), 0) / 255.0
         blurred_mask_3d = blurred_mask[:, :, np.newaxis]
         
@@ -257,10 +257,10 @@ class FaceSwapper:
         Returns:
             Dictionary with processing metadata
         """
-        # Load source image
+        
         source_image = self.image_processor.load_image(source_image_path)
         
-        # Detect source face
+        
         source_faces = self.face_detector.detect_faces(source_image)
         if not source_faces:
             raise ValueError("No face detected in source image")
@@ -273,18 +273,18 @@ class FaceSwapper:
         if source_landmarks is None:
             raise ValueError("Could not detect landmarks in source image")
         
-        # Open video
+        
         cap = cv2.VideoCapture(target_video_path)
         if not cap.isOpened():
             raise ValueError(f"Could not open video: {target_video_path}")
         
-        # Get video properties
+        
         video_fps = fps if fps else int(cap.get(cv2.CAP_PROP_FPS))
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         
-        # Setup video writer
+        
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(output_video_path, fourcc, video_fps, (width, height))
         
@@ -299,21 +299,21 @@ class FaceSwapper:
                 if not ret:
                     break
                 
-                # Convert BGR to RGB
+                
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
-                # Detect faces in frame
+                
                 target_faces = self.face_detector.detect_faces(frame_rgb)
                 
                 if target_faces:
-                    # Use first detected face
+                    
                     target_face = target_faces[0]
                     target_landmarks = self.face_detector.get_face_landmarks(
                         frame_rgb, target_face["bbox"]
                     )
                     
                     if target_landmarks is not None:
-                        # Perform swap
+                        
                         swapped_frame = self._perform_swap(
                             source_image, frame_rgb,
                             source_face["bbox"], target_face["bbox"],
@@ -326,7 +326,7 @@ class FaceSwapper:
                 else:
                     swapped_frame = frame_rgb
                 
-                # Convert back to BGR and write
+                
                 swapped_bgr = cv2.cvtColor(swapped_frame, cv2.COLOR_RGB2BGR)
                 out.write(swapped_bgr)
                 
@@ -371,18 +371,18 @@ class FaceSwapper:
         Returns:
             Metadata dictionary
         """
-        # Load images
+        
         source_image = self.image_processor.load_image(source_image_path)
         target_image = self.image_processor.load_image(target_image_path)
         
-        # Perform swap
+        
         result, metadata = self.swap_faces(
             source_image, target_image,
             source_face_idx, target_face_idx,
             blend_mode, blend_factor
         )
         
-        # Save result
+        
         self.image_processor.save_image(result, output_path)
         metadata["output_path"] = output_path
         

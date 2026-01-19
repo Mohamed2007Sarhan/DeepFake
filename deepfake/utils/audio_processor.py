@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Audio Processing Utilities
 """
 
@@ -70,29 +70,29 @@ class AudioProcessor:
         """
         features = {}
         
-        # Pitch (fundamental frequency)
+        
         pitches, magnitudes = librosa.piptrack(y=audio, sr=sr)
         pitch = pitches[pitches > 0]
         features['pitch_mean'] = float(np.mean(pitch)) if len(pitch) > 0 else 0.0
         features['pitch_std'] = float(np.std(pitch)) if len(pitch) > 0 else 0.0
         
-        # Spectral centroid (brightness)
+        
         spectral_centroids = librosa.feature.spectral_centroid(y=audio, sr=sr)[0]
         features['spectral_centroid_mean'] = float(np.mean(spectral_centroids))
         
-        # MFCC (Mel-frequency cepstral coefficients)
+        
         mfccs = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=13)
         features['mfcc_mean'] = [float(x) for x in np.mean(mfccs, axis=1)]
         
-        # Zero crossing rate
+        
         zcr = librosa.feature.zero_crossing_rate(audio)[0]
         features['zcr_mean'] = float(np.mean(zcr))
         
-        # Tempo
+        
         tempo, _ = librosa.beat.beat_track(y=audio, sr=sr)
         features['tempo'] = float(tempo)
         
-        # Duration
+        
         features['duration'] = len(audio) / sr
         
         return features
@@ -185,20 +185,20 @@ class AudioProcessor:
         Returns:
             Filtered audio
         """
-        # Design filter
+        
         nyquist = sr / 2
         
         if lowcut and highcut:
-            # Bandpass
+            
             low = lowcut / nyquist
             high = highcut / nyquist
             b, a = signal.butter(5, [low, high], btype='band')
         elif lowcut:
-            # Highpass
+            
             low = lowcut / nyquist
             b, a = signal.butter(5, low, btype='high')
         elif highcut:
-            # Lowpass
+            
             high = highcut / nyquist
             b, a = signal.butter(5, high, btype='low')
         else:

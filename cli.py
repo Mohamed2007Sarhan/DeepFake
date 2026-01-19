@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Quick launcher for interactive CLI
 """
 

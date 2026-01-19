@@ -1,4 +1,4 @@
-"""
+utf-8"""
 DeepFake Framework - Main Entry Point
 Example usage and CLI interface
 """
@@ -39,10 +39,10 @@ For more help on a specific command:
     )
 
 
-    # Create subparsers for different modes
+    
     subparsers = parser.add_subparsers(dest="mode", help="Processing mode", metavar="<command>")
     
-    # Original modes
+    
     parser_img = subparsers.add_parser("image", help="Image processing modes")
     parser_img.add_argument("--input", "-i", type=str, required=True, help="Input image path")
     parser_img.add_argument("--output", "-o", type=str, help="Output image path")
@@ -53,7 +53,7 @@ For more help on a specific command:
     parser_img.add_argument("--device", "-d", type=str, choices=["cpu", "cuda"], default="cpu",
                            help="Device to use (cpu/cuda)")
     
-    # Face swap modes
+    
     parser_swap = subparsers.add_parser("swap", help="Face swapping")
     parser_swap.add_argument("--source", "-s", type=str, required=True,
                             help="Source image path (face to swap from)")
@@ -69,7 +69,7 @@ For more help on a specific command:
     parser_swap.add_argument("--target-face", type=int, default=0,
                             help="Target face index (if multiple faces)")
     
-    # Voice cloning modes
+    
     parser_voice = subparsers.add_parser("voice", help="Voice cloning and synthesis")
     parser_voice.add_argument("--sample", "-s", type=str, required=True,
                              help="Voice sample audio file path")
@@ -81,7 +81,7 @@ For more help on a specific command:
                              choices=["auto", "coqui", "pyttsx3", "gtts"],
                              default="auto", help="TTS method")
     
-    # For backwards compatibility
+    
     parser.add_argument("--input", "-i", type=str, help="Input image path (legacy)")
     parser.add_argument("--output", "-o", type=str, help="Output path (legacy)")
     parser.add_argument("--mode", "-m", type=str, help="Processing mode (legacy)")
@@ -91,7 +91,7 @@ For more help on a specific command:
     
     args = parser.parse_args()
     
-    # Handle interactive mode
+    
     if args.interactive or (not args.mode and not hasattr(args, 'type')):
         try:
             from deepfake.cli import main_interactive
@@ -104,9 +104,9 @@ For more help on a specific command:
             print("Use --help to see available commands.")
             return
     
-    # Handle legacy mode
+    
     if args.mode and not hasattr(args, 'type'):
-        # Legacy single-argument mode
+        
         legacy_args = type('obj', (object,), {
             'input': args.input,
             'output': args.output,
@@ -119,7 +119,7 @@ For more help on a specific command:
     else:
         mode = args.mode if hasattr(args, 'mode') and args.mode else "image"
     
-    # Initialize framework
+    
     print("Initializing DeepFake Framework...")
     config_path = getattr(args, 'config', None)
     device = getattr(args, 'device', 'cpu')
@@ -129,15 +129,15 @@ For more help on a specific command:
         model={"device": device}
     )
     
-    # Process based on mode
+    
     if mode == "swap":
-        # Face swapping mode
+        
         print("\n=== Face Swapping ===")
         source = args.source
         target = args.target
         output = args.output
         
-        # Check if target is video
+        
         is_video = target.lower().endswith(('.mp4', '.avi', '.mov', '.mkv', '.flv'))
         
         if is_video:
@@ -182,7 +182,7 @@ For more help on a specific command:
         print(f"\nSaved to: {output}")
     
     elif mode == "voice":
-        # Voice cloning mode
+        
         print("\n=== Voice Cloning ===")
         sample = args.sample
         text = args.text
@@ -192,11 +192,11 @@ For more help on a specific command:
         print(f"Text: {text[:100]}...")
         print(f"Output: {output}")
         
-        # Initialize voice cloner with specified method
+        
         from deepfake.voice_cloner import VoiceCloner
         voice_cloner = VoiceCloner(method=getattr(args, 'method', 'auto'))
         
-        # Clone voice
+        
         result = voice_cloner.clone_voice_from_sample(
             voice_sample_path=sample,
             text=text,
@@ -209,7 +209,7 @@ For more help on a specific command:
         print(f"  Saved to: {output}")
         
     elif mode == "image":
-        # Original image processing modes
+        
         input_path = getattr(args, 'input', None)
         if not input_path:
             print("Error: --input is required for image processing mode")

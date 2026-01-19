@@ -1,4 +1,4 @@
-"""CLI Interface Module"""
+utf-8"""CLI Interface Module"""
 
 from .cli_interface import CLIInterface, main_interactive
 

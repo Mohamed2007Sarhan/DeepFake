@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Voice Cloning and Text-to-Speech Module
 Clones a voice from a sample and synthesizes speech from text
 """
@@ -11,7 +11,7 @@ import tempfile
 
 from .utils.audio_processor import AudioProcessor
 
-# Try to import TTS libraries
+
 try:
     import pyttsx3
     PYTTSX3_AVAILABLE = True
@@ -55,12 +55,12 @@ class VoiceCloner:
         self.device = device
         self.audio_processor = AudioProcessor()
         
-        # Initialize TTS engine
+        
         self.tts_engine = None
         self.coqui_tts = None
         self._init_tts()
         
-        # Voice characteristics storage
+        
         self.voice_profile: Optional[Dict] = None
     
     def _init_tts(self):
@@ -81,7 +81,7 @@ class VoiceCloner:
             except Exception as e:
                 print(f"Warning: Could not initialize pyttsx3: {e}")
         
-        # Auto-select method
+        
         if COQUI_TTS_AVAILABLE:
             try:
                 self.coqui_tts = TTS.tts.TTS("tts_models/multilingual/multi-dataset/your_tts")
@@ -117,16 +117,16 @@ class VoiceCloner:
         Returns:
             Dictionary with voice characteristics
         """
-        # Load audio
+        
         audio, sr = self.audio_processor.load_audio(audio_path)
         
-        # Trim silence
+        
         audio = self.audio_processor.trim_silence(audio)
         
-        # Extract features
+        
         features = self.audio_processor.extract_features(audio, sr)
         
-        # Store as voice profile
+        
         self.voice_profile = {
             "features": features,
             "sample_rate": sr,
@@ -158,7 +158,7 @@ class VoiceCloner:
         if voice_profile is None:
             raise ValueError("No voice profile available. Call analyze_voice() first.")
         
-        # Synthesize based on method
+        
         if self.method == "coqui" and self.coqui_tts:
             return self._synthesize_coqui(text, output_path, voice_profile, adjust_to_profile)
         elif self.method == "pyttsx3" and self.tts_engine:
@@ -172,24 +172,24 @@ class VoiceCloner:
                          voice_profile: Dict, adjust_to_profile: bool) -> Dict:
         """Synthesize using Coqui TTS with voice cloning"""
         try:
-            # Coqui TTS with voice cloning
+            
             speaker_wav = voice_profile.get("source_audio")
             
             if speaker_wav and os.path.exists(speaker_wav):
-                # Use voice cloning
+                
                 self.coqui_tts.tts_to_file(
                     text=text,
                     file_path=output_path,
                     speaker_wav=speaker_wav
                 )
             else:
-                # Standard synthesis
+                
                 self.coqui_tts.tts_to_file(
                     text=text,
                     file_path=output_path
                 )
             
-            # Adjust to profile if requested
+            
             if adjust_to_profile:
                 self._adjust_to_profile(output_path, voice_profile)
             
@@ -207,38 +207,38 @@ class VoiceCloner:
                             voice_profile: Dict, adjust_to_profile: bool) -> Dict:
         """Synthesize using pyttsx3 with voice parameter adjustment"""
         try:
-            # Adjust voice parameters based on profile
+            
             features = voice_profile.get("features", {})
             
-            # Adjust rate (speed) based on tempo
+            
             tempo = features.get("tempo", 120)
-            rate = int(150 + (tempo - 120) * 0.5)  # Adjust rate based on tempo
+            rate = int(150 + (tempo - 120) * 0.5)  
             self.tts_engine.setProperty('rate', rate)
             
-            # Adjust pitch (if available)
+            
             pitch_mean = features.get("pitch_mean", 0)
             if pitch_mean > 0:
-                # pyttsx3 doesn't directly support pitch, but we can adjust voice
+                
                 voices = self.tts_engine.getProperty('voices')
                 if voices:
-                    # Select voice based on pitch (higher pitch = female voice typically)
-                    if pitch_mean > 200:  # Higher pitch
-                        # Try to find a higher-pitched voice
+                    
+                    if pitch_mean > 200:  
+                        
                         for voice in voices:
                             if 'female' in voice.name.lower() or 'woman' in voice.name.lower():
                                 self.tts_engine.setProperty('voice', voice.id)
                                 break
-                    else:  # Lower pitch
+                    else:  
                         for voice in voices:
                             if 'male' in voice.name.lower() or 'man' in voice.name.lower():
                                 self.tts_engine.setProperty('voice', voice.id)
                                 break
             
-            # Save to file
+            
             self.tts_engine.save_to_file(text, output_path)
             self.tts_engine.runAndWait()
             
-            # Adjust audio to better match profile
+            
             if adjust_to_profile:
                 self._adjust_to_profile(output_path, voice_profile)
             
@@ -256,32 +256,32 @@ class VoiceCloner:
                         voice_profile: Dict, adjust_to_profile: bool) -> Dict:
         """Synthesize using Google TTS (limited voice cloning)"""
         try:
-            # gTTS doesn't support voice cloning, but we can adjust parameters
+            
             features = voice_profile.get("features", {})
             
-            # Determine language (default to English)
+            
             lang = 'en'
             
-            # Generate speech
+            
             tts = gTTS(text=text, lang=lang, slow=False)
             
-            # Save to temporary file first
+            
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as tmp_file:
                 tmp_path = tmp_file.name
                 tts.save(tmp_path)
             
-            # Convert to target format and adjust
+            
             if adjust_to_profile:
                 audio, sr = self.audio_processor.load_audio(tmp_path)
                 
-                # Adjust based on profile
+                
                 audio = self._adjust_audio_to_profile(audio, sr, voice_profile)
                 
-                # Save
+                
                 self.audio_processor.save_audio(audio, output_path, sr)
                 os.remove(tmp_path)
             else:
-                # Just convert format
+                
                 audio, sr = self.audio_processor.load_audio(tmp_path)
                 self.audio_processor.save_audio(audio, output_path, sr)
                 os.remove(tmp_path)
@@ -304,13 +304,13 @@ class VoiceCloner:
             audio_path: Path to audio file to adjust
             voice_profile: Voice profile to match
         """
-        # Load audio
+        
         audio, sr = self.audio_processor.load_audio(audio_path)
         
-        # Adjust to match profile
+        
         adjusted = self._adjust_audio_to_profile(audio, sr, voice_profile)
         
-        # Save adjusted audio
+        
         self.audio_processor.save_audio(adjusted, audio_path, sr)
     
     def _adjust_audio_to_profile(self, audio: np.ndarray, sr: int,
@@ -328,35 +328,35 @@ class VoiceCloner:
         """
         features = voice_profile.get("features", {})
         
-        # Adjust pitch
+        
         target_pitch = features.get("pitch_mean", 0)
         if target_pitch > 0:
-            # Get current pitch
+            
             current_features = self.audio_processor.extract_features(audio, sr)
             current_pitch = current_features.get("pitch_mean", target_pitch)
             
             if current_pitch > 0:
-                # Calculate semitones difference
+                
                 semitones = 12 * np.log2(target_pitch / current_pitch)
-                # Limit adjustment
+                
                 semitones = np.clip(semitones, -4, 4)
                 
                 if abs(semitones) > 0.1:
                     audio = self.audio_processor.adjust_pitch(audio, sr, semitones)
         
-        # Adjust speed based on tempo
+        
         target_tempo = features.get("tempo", 120)
         current_features = self.audio_processor.extract_features(audio, sr)
         current_tempo = current_features.get("tempo", target_tempo)
         
         if current_tempo > 0:
             speed_factor = target_tempo / current_tempo
-            speed_factor = np.clip(speed_factor, 0.8, 1.2)  # Limit adjustment
+            speed_factor = np.clip(speed_factor, 0.8, 1.2)  
             
             if abs(speed_factor - 1.0) > 0.05:
                 audio = self.audio_processor.adjust_speed(audio, speed_factor)
         
-        # Normalize
+        
         audio = self.audio_processor.normalize_audio(audio)
         
         return audio
@@ -383,7 +383,7 @@ class VoiceCloner:
         Returns:
             Dictionary with results and metadata
         """
-        # Step 1: Analyze voice
+        
         print("Analyzing voice sample...")
         voice_profile = self.analyze_voice(voice_sample_path)
         
@@ -392,7 +392,7 @@ class VoiceCloner:
         print(f"  Tempo: {voice_profile['features'].get('tempo', 0):.1f} BPM")
         print(f"  Duration: {voice_profile['duration']:.2f}s")
         
-        # Step 2: Synthesize speech
+        
         print(f"Synthesizing speech: '{text[:50]}...'")
         result = self.synthesize_speech(
             text=text,

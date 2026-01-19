@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Model Downloader Script
 Downloads the best recommended model for clothing removal
 """
@@ -36,7 +36,7 @@ def main():
         return
     
     if args.auto or args.model is None:
-        # Download recommended model
+        
         print("\n" + "="*60)
         print("Downloading Recommended Model")
         print("="*60 + "\n")
@@ -59,7 +59,7 @@ def main():
             print(f"2. Download and place in: models/")
             print(f"3. Name it: {recommended['filename']}")
     else:
-        # Download specific model
+        
         model_path = downloader.download_model(args.model)
         if model_path:
             print(f"\n✓ Model downloaded: {model_path}")

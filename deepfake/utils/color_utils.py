@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Color Utility Functions
 """
 
@@ -28,28 +28,28 @@ class ColorUtils:
         Extract dominant colors using K-Means clustering
         Returns: List of (R, G, B, percentage) tuples
         """
-        # Reshape image to be a list of pixels
+        
         pixels = image.reshape(-1, 3)
         
-        # Remove pixels with alpha channel if present
+        
         if pixels.shape[1] == 4:
             pixels = pixels[:, :3]
         
-        # Filter out black/white/transparent pixels (optional)
+        
         pixels = pixels[np.sum(pixels, axis=1) > 0]
         
         if len(pixels) == 0:
             return []
         
-        # Apply K-Means
+        
         kmeans = KMeans(n_clusters=n_colors, random_state=42, n_init=10)
         kmeans.fit(pixels)
         
-        # Get cluster centers and labels
+        
         colors = kmeans.cluster_centers_.astype(int)
         labels = kmeans.labels_
         
-        # Calculate percentages
+        
         label_counts = Counter(labels)
         total_pixels = len(labels)
         
@@ -58,7 +58,7 @@ class ColorUtils:
             percentage = (label_counts[i] / total_pixels) * 100
             result.append((int(color[0]), int(color[1]), int(color[2]), percentage))
         
-        # Sort by percentage (descending)
+        
         result.sort(key=lambda x: x[3], reverse=True)
         return result
     
@@ -67,7 +67,7 @@ class ColorUtils:
         """Get single dominant color using histogram"""
         pixels = image.reshape(-1, 3)
         
-        # Calculate mean color
+        
         mean_color = np.mean(pixels, axis=0).astype(int)
         return tuple(mean_color)
     
@@ -88,7 +88,7 @@ class ColorUtils:
         """Classify RGB color into a named color"""
         r, g, b = rgb
         
-        # Simple color classification
+        
         if r > 200 and g > 200 and b > 200:
             return "White"
         elif r < 50 and g < 50 and b < 50:

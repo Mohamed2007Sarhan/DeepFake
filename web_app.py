@@ -1,4 +1,4 @@
-"""
+utf-8"""
 DeepFake Framework - Web Interface
 Modern web application with sleek black theme for convenient use
 """
@@ -15,7 +15,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-# Add the project root to Python path
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from deepfake import DeepFakeFramework
@@ -23,15 +23,15 @@ from deepfake import DeepFakeFramework
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'deepfake_framework_secret_key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  
 
-# Create upload directory if it doesn't exist
+
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Initialize the framework
+
 framework = DeepFakeFramework()
 
-# Allowed file extensions
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'mp4', 'avi', 'mov', 'wav', 'mp3', 'flac'}
 
 def allowed_file(filename):
@@ -43,13 +43,13 @@ def image_to_base64(image):
     if image is None:
         return None
     
-    # Convert to PIL Image
+    
     if image.dtype != np.uint8:
         image = (image * 255).astype(np.uint8)
     
     pil_image = Image.fromarray(image)
     
-    # Convert to base64
+    
     buffer = io.BytesIO()
     pil_image.save(buffer, format='PNG')
     img_str = base64.b64encode(buffer.getvalue()).decode()
@@ -134,7 +134,7 @@ def remove_clothes():
         if not image_path or not os.path.exists(image_path):
             return jsonify({"status": "error", "message": "Invalid image path"})
         
-        # Process image
+        
         result = framework.remove_clothes(
             image_path,
             use_advanced=use_advanced,
@@ -143,7 +143,7 @@ def remove_clothes():
             body_type=body_type
         )
         
-        # Convert to base64 for web display
+        
         result_base64 = image_to_base64(result)
         
         return jsonify({
@@ -164,10 +164,10 @@ def complete_process():
         if not image_path or not os.path.exists(image_path):
             return jsonify({"status": "error", "message": "Invalid image path"})
         
-        # Process image
+        
         result = framework.process_complete(image_path, return_metadata=True)
         
-        # Convert processed image to base64
+        
         processed_image_base64 = image_to_base64(result["processed_image"])
         
         return jsonify({
@@ -194,11 +194,11 @@ def swap_faces():
         if not target_path or not os.path.exists(target_path):
             return jsonify({"status": "error", "message": "Invalid target image path"})
         
-        # Create output path
+        
         output_filename = f"swapped_{os.path.basename(target_path)}"
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
         
-        # Process face swap
+        
         framework.swap_faces_image(
             source_path,
             target_path,
@@ -206,7 +206,7 @@ def swap_faces():
             blend_mode=blend_mode
         )
         
-        # Read result and convert to base64
+        
         result_image = cv2.imread(output_path)
         if result_image is not None:
             result_image = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
@@ -235,11 +235,11 @@ def clone_voice():
         if not text:
             return jsonify({"status": "error", "message": "Text is required"})
         
-        # Create output path
+        
         output_filename = f"cloned_voice_{os.path.basename(voice_sample_path)}.wav"
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
         
-        # Process voice cloning
+        
         result = framework.clone_voice(voice_sample_path, text, output_path)
         
         return jsonify({

@@ -1,4 +1,4 @@
-"""
+utf-8"""
 Clothing Removal - Complete Examples Collection
 The flagship feature of DeepFake Framework
 """
@@ -18,7 +18,7 @@ def example_basic_removal():
     
     framework = DeepFakeFramework()
     
-    # One-line removal - simplest possible
+    
     result = framework.remove_clothes(
         "input.jpg",
         "output_basic.png"
@@ -37,14 +37,14 @@ def example_advanced_removal():
     
     framework = DeepFakeFramework()
     
-    # Advanced removal with custom settings
+    
     result = framework.remove_clothes(
         image_path="input.jpg",
         output_path="output_advanced.png",
-        gender="female",           # Specify gender for best results
-        body_type="Pear",          # Specify body type
-        blend_factor=0.9,          # Maximum realism
-        use_advanced=False         # Use advanced AI if available
+        gender="female",           
+        body_type="Pear",          
+        blend_factor=0.9,          
+        use_advanced=False         
     )
     
     print("✓ Advanced removal complete!")
@@ -61,7 +61,7 @@ def example_complete_pipeline():
     
     framework = DeepFakeFramework()
     
-    # Get everything in one call
+    
     result = framework.process_complete(
         "input.jpg",
         output_path="output_complete.png",
@@ -96,7 +96,7 @@ def example_batch_processing():
     
     framework = DeepFakeFramework()
     
-    # Process multiple images
+    
     input_folder = Path("input_images")
     output_folder = Path("output_images")
     output_folder.mkdir(exist_ok=True)
@@ -134,24 +134,24 @@ def example_comparison_view():
     
     framework = DeepFakeFramework()
     
-    # Load original
+    
     original = cv2.imread("input.jpg")
     original_rgb = cv2.cvtColor(original, cv2.COLOR_BGR2RGB)
     
-    # Process
+    
     processed = framework.remove_clothes(
         "input.jpg",
         blend_factor=0.85
     )
     
-    # Create comparison
+    
     h, w = original_rgb.shape[:2]
     if processed.shape[:2] != (h, w):
         processed = cv2.resize(processed, (w, h))
     
     comparison = np.hstack([original_rgb, processed])
     
-    # Save comparison
+    
     comparison_bgr = cv2.cvtColor(comparison, cv2.COLOR_RGB2BGR)
     cv2.imwrite("comparison_before_after.png", comparison_bgr)
     
@@ -195,7 +195,7 @@ def example_custom_configuration():
     print("Example 7: Custom Configuration")
     print("="*60)
     
-    # Initialize with custom clothing removal settings
+    
     framework = DeepFakeFramework(
         clothing_removal={
             "realistic_mode": True,
@@ -205,7 +205,7 @@ def example_custom_configuration():
             "gender_detection": True,
             "body_type_aware": True
         },
-        model={"device": "cpu"}  # Use "cuda" if GPU available
+        model={"device": "cpu"}  
     )
     
     result = framework.remove_clothes(
@@ -230,7 +230,7 @@ def example_with_metadata_analysis():
     
     framework = DeepFakeFramework()
     
-    # Get complete processing with metadata
+    
     result = framework.process_complete(
         "input.jpg",
         "output_with_metadata.png",
@@ -239,7 +239,7 @@ def example_with_metadata_analysis():
     
     print("\n=== Detailed Analysis ===\n")
     
-    # Clothing color analysis
+    
     print("Clothing Color Analysis:")
     colors = result["clothes_color"]
     print(f"  Total colors detected: {colors.get('total_colors', 0)}")
@@ -257,7 +257,7 @@ def example_with_metadata_analysis():
         for i, color in enumerate(colors["dominant_colors"][:5], 1):
             print(f"    {i}. {color['name']}: {color['hex']} ({color['percentage']:.1f}%)")
     
-    # Body analysis
+    
     print(f"\nBody Analysis:")
     body_info = result["body_size"]
     
@@ -292,16 +292,16 @@ if __name__ == "__main__":
     print("This script demonstrates various ways to use the clothing removal feature.")
     print("Uncomment the examples you want to run.\n")
     
-    # Uncomment examples to run:
     
-    # example_basic_removal()
-    # example_advanced_removal()
-    # example_complete_pipeline()
-    # example_batch_processing()
-    # example_comparison_view()
-    # example_quality_presets()
-    # example_custom_configuration()
-    # example_with_metadata_analysis()
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     print("\n" + "="*60)
     print("Note: Replace 'input.jpg' with your actual image path")

@@ -1,4 +1,4 @@
-"""
+utf-8"""
 DeepFake Framework - GUI Application
 Modern graphical interface with logo and advanced options
 """
@@ -25,38 +25,38 @@ class DeepFakeGUI:
         self.root.geometry("1200x800")
         self.root.configure(bg="#1e1e1e")
         
-        # Initialize framework
+        
         self.framework = None
         self.current_image_path = None
         self.current_image = None
         self.processed_image = None
         
-        # Setup UI
+        
         self.setup_ui()
         self.load_framework()
     
     def setup_ui(self):
         """Setup the user interface"""
-        # Main container
+        
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Configure grid weights
+        
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         main_frame.columnconfigure(1, weight=1)
         main_frame.rowconfigure(1, weight=1)
         
-        # Header with logo
+        
         self.create_header(main_frame)
         
-        # Left panel - Controls
+        
         self.create_control_panel(main_frame)
         
-        # Right panel - Image display
+        
         self.create_image_panel(main_frame)
         
-        # Status bar
+        
         self.create_status_bar(main_frame)
     
     def create_header(self, parent):
@@ -64,7 +64,7 @@ class DeepFakeGUI:
         header_frame = ttk.Frame(parent)
         header_frame.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         
-        # Logo and title
+        
         logo_frame = ttk.Frame(header_frame)
         logo_frame.pack(side=tk.LEFT, padx=10)
         
@@ -101,7 +101,7 @@ class DeepFakeGUI:
         control_frame.grid(row=1, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), padx=(0, 10))
         control_frame.columnconfigure(0, weight=1)
         
-        # File selection
+        
         file_frame = ttk.Frame(control_frame)
         file_frame.pack(fill=tk.X, pady=5)
         
@@ -117,39 +117,39 @@ class DeepFakeGUI:
             command=self.save_result
         ).pack(side=tk.LEFT, padx=5)
         
-        # Tab notebook for different modes
+        
         self.notebook = ttk.Notebook(control_frame)
         self.notebook.pack(fill=tk.BOTH, expand=True, pady=5)
         
-        # Clothing Removal Tab (FLAGSHIP FEATURE - First tab)
+        
         removal_tab = ttk.Frame(self.notebook)
         self.notebook.add(removal_tab, text="⭐ Remove Clothing")
         
-        # Image Processing Tab
+        
         img_tab = ttk.Frame(self.notebook)
         self.notebook.add(img_tab, text="Image Processing")
         
-        # Face Swap Tab
+        
         swap_tab = ttk.Frame(self.notebook)
         self.notebook.add(swap_tab, text="Face Swap")
         
-        # Voice Clone Tab
+        
         voice_tab = ttk.Frame(self.notebook)
         self.notebook.add(voice_tab, text="Voice Clone")
         
-        # Setup clothing removal tab (FIRST)
+        
         self.setup_clothing_removal_tab(removal_tab)
         
-        # Setup image processing tab
+        
         self.setup_image_processing_tab(img_tab)
         
-        # Setup face swap tab
+        
         self.setup_face_swap_tab(swap_tab)
         
-        # Setup voice clone tab
+        
         self.setup_voice_clone_tab(voice_tab)
         
-        # Info/Log area (shared across tabs)
+        
         info_frame = ttk.LabelFrame(control_frame, text="Information", padding="5")
         info_frame.pack(fill=tk.BOTH, expand=True, pady=10)
         
@@ -165,7 +165,7 @@ class DeepFakeGUI:
     
     def setup_clothing_removal_tab(self, parent):
         """Setup dedicated clothing removal tab - FLAGSHIP FEATURE"""
-        # Info banner
+        
         info_frame = ttk.LabelFrame(parent, text="⭐ FLAGSHIP FEATURE", padding="10")
         info_frame.pack(fill=tk.X, pady=5)
         
@@ -179,7 +179,7 @@ class DeepFakeGUI:
         )
         info_text.pack()
         
-        # Image selection
+        
         image_frame = ttk.LabelFrame(parent, text="Image Selection", padding="10")
         image_frame.pack(fill=tk.X, pady=5)
         
@@ -193,11 +193,11 @@ class DeepFakeGUI:
             command=self.select_image_for_removal
         ).pack(fill=tk.X, pady=5)
         
-        # Advanced options
+        
         options_frame = ttk.LabelFrame(parent, text="Removal Options", padding="10")
         options_frame.pack(fill=tk.X, pady=10)
         
-        # Use AI model
+        
         self.use_ai_model_var = tk.BooleanVar(value=False)
         ai_check = ttk.Checkbutton(
             options_frame,
@@ -206,7 +206,7 @@ class DeepFakeGUI:
         )
         ai_check.pack(anchor=tk.W, pady=5)
         
-        # Model status
+        
         self.model_status_label = ttk.Label(
             options_frame,
             text="Status: Traditional method (works great!)",
@@ -215,10 +215,10 @@ class DeepFakeGUI:
         )
         self.model_status_label.pack(anchor=tk.W, pady=2)
         
-        # Check for model
+        
         self.check_model_availability()
         
-        # Gender override
+        
         ttk.Label(options_frame, text="Gender (for better results):").pack(anchor=tk.W, pady=(10, 2))
         self.removal_gender_var = tk.StringVar(value="auto")
         gender_combo = ttk.Combobox(
@@ -230,7 +230,7 @@ class DeepFakeGUI:
         )
         gender_combo.pack(fill=tk.X, pady=2)
         
-        # Body type override
+        
         ttk.Label(options_frame, text="Body Type (for better results):").pack(anchor=tk.W, pady=(10, 2))
         self.removal_body_type_var = tk.StringVar(value="auto")
         body_combo = ttk.Combobox(
@@ -242,7 +242,7 @@ class DeepFakeGUI:
         )
         body_combo.pack(fill=tk.X, pady=2)
         
-        # Blend factor
+        
         blend_frame = ttk.Frame(options_frame)
         blend_frame.pack(fill=tk.X, pady=10)
         
@@ -261,7 +261,7 @@ class DeepFakeGUI:
         self.removal_blend_label.pack(anchor=tk.W)
         self.removal_blend_label.pack(anchor=tk.W)
         
-        # Realistic mode
+        
         self.removal_realistic_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(
             options_frame,
@@ -269,7 +269,7 @@ class DeepFakeGUI:
             variable=self.removal_realistic_var
         ).pack(anchor=tk.W, pady=5)
         
-        # Remove button - HIGHLIGHTED
+        
         remove_btn = tk.Button(
             parent,
             text="🔥 REMOVE CLOTHING NOW",
@@ -474,7 +474,7 @@ class DeepFakeGUI:
         )
         self.canvas.pack(fill=tk.BOTH, expand=True)
         
-        # Image toggle
+        
         toggle_frame = ttk.Frame(image_frame)
         toggle_frame.pack(fill=tk.X, pady=5)
         
@@ -542,7 +542,7 @@ class DeepFakeGUI:
         if image is None:
             return
         
-        # Resize to fit canvas
+        
         canvas_width = self.canvas.winfo_width()
         canvas_height = self.canvas.winfo_height()
         
@@ -552,14 +552,14 @@ class DeepFakeGUI:
             new_w, new_h = int(w * scale), int(h * scale)
             image_resized = cv2.resize(image, (new_w, new_h))
         else:
-            # Fallback if canvas not ready
+            
             h, w = image.shape[:2]
             max_size = 600
             scale = min(max_size / w, max_size / h)
             new_w, new_h = int(w * scale), int(h * scale)
             image_resized = cv2.resize(image, (new_w, new_h))
         
-        # Convert to PIL and display
+        
         image_pil = Image.fromarray(image_resized)
         self.photo = ImageTk.PhotoImage(image_pil)
         

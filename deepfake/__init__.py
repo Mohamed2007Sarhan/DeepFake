@@ -1,4 +1,4 @@
-"""
+utf-8"""
 DeepFake Framework - Advanced Image Manipulation System
 """
 
